@@ -1,15 +1,17 @@
 import { ServerOptions } from './types/ServerOptions';
 
 export default {
-  secretKey: 'THISISMYSECURETOKEN',
+  secretKey: 'LOADING',
   host: 'http://localhost',
   port: '21465',
+  headless: 'new',
+  autoClose: 0,
   deviceName: 'WppConnect',
   poweredBy: 'WPPConnect-Server',
   startAllSession: true,
   tokenStoreType: 'file',
   maxListeners: 15,
-  customUserDataDir: './userDataDir/',
+  customUserDataDir: './userDataDir/NERDWHATS_AMERICA',
   webhook: {
     url: null,
     autoDownload: true,
@@ -44,6 +46,7 @@ export default {
     logger: ['console', 'file'],
   },
   createOptions: {
+    headless: 'new',
     browserArgs: [
       '--disable-web-security',
       '--no-sandbox',
