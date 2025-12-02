@@ -11,7 +11,7 @@ export default {
   startAllSession: true,
   tokenStoreType: 'file',
   maxListeners: 15,
-  customUserDataDir: './userDataDir/NERDWHATS_AMERICA',
+  customUserDataDir: './userDataDir',
   webhook: {
     url: null,
     autoDownload: true,
