@@ -2,7 +2,7 @@ import { ServerOptions } from './types/ServerOptions';
 
 export default {
   secretKey: 'LOADING',
-  host: 'http://localhost',
+  host: '0.0.0.0',
   port: '21465',
   headless: 'new',
   autoClose: 0,
