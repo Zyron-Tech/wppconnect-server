@@ -1,28 +1,18 @@
 import { ServerOptions } from './types/ServerOptions';
 
-// Auto-detect environment (Render or local)
-const isProduction = process.env.NODE_ENV === 'production';
-
 export default {
   secretKey: 'LOADING',
-
   host: '0.0.0.0',
   port: '21465',
-
-  // Local = false (show QR)
-  // Production (Render) = true (headless only)
-  headless: isProduction,
-
-  // Do not auto-close session
+  headless: true, // MUST BE TRUE ON RENDER
   autoClose: 0,
-
   deviceName: 'WppConnect',
   poweredBy: 'WPPConnect-Server',
   startAllSession: true,
   tokenStoreType: 'file',
   maxListeners: 15,
   customUserDataDir: './userDataDir',
-
+  
   webhook: {
     url: null,
     autoDownload: true,
@@ -62,8 +52,7 @@ export default {
   },
 
   createOptions: {
-    headless: isProduction, // Auto-detect
-
+    headless: true, // VERY IMPORTANT ON RENDER
     browserArgs: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -88,7 +77,6 @@ export default {
       '--ignore-certificate-errors',
       '--ignore-ssl-errors',
     ],
-
     linkPreviewApiServers: null,
   },
 
@@ -114,7 +102,7 @@ export default {
   },
 
   aws_s3: {
-    region: 'sa-east-1' as any,
+    region: 'sa-east-1',
     access_key_id: null,
     secret_key: null,
     defaultBucketName: null,
