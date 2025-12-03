@@ -1,17 +1,28 @@
 import { ServerOptions } from './types/ServerOptions';
 
+// Auto-detect environment (Render or local)
+const isProduction = process.env.NODE_ENV === 'production';
+
 export default {
   secretKey: 'LOADING',
+
   host: '0.0.0.0',
   port: '21465',
-  headless: true,
+
+  // Local = false (show QR)
+  // Production (Render) = true (headless only)
+  headless: isProduction,
+
+  // Do not auto-close session
   autoClose: 0,
+
   deviceName: 'WppConnect',
   poweredBy: 'WPPConnect-Server',
   startAllSession: true,
   tokenStoreType: 'file',
   maxListeners: 15,
   customUserDataDir: './userDataDir',
+
   webhook: {
     url: null,
     autoDownload: true,
@@ -28,68 +39,64 @@ export default {
     onSelfMessage: false,
     ignore: ['status@broadcast'],
   },
+
   websocket: {
     autoDownload: false,
     uploadS3: false,
   },
+
   chatwoot: {
     sendQrCode: true,
     sendStatus: true,
   },
+
   archive: {
     enable: false,
     waitTime: 10,
     daysToArchive: 45,
   },
+
   log: {
-    level: 'silly', // Before open a issue, change level to silly and retry a action
+    level: 'silly',
     logger: ['console', 'file'],
   },
-  createOptions: {
-    headless: true,
-    browserArgs: [
-  '--no-sandbox',
-  '--disable-setuid-sandbox',
-  '--disable-web-security',
-  '--aggressive-cache-discard',
-  '--disable-cache',
-  '--disable-application-cache',
-  '--disable-offline-load-stale-cache',
-  '--disk-cache-size=0',
-  '--disable-background-networking',
-  '--disable-default-apps',
-  '--disable-extensions',
-  '--disable-sync',
-  '--disable-dev-shm-usage',
-  '--disable-gpu',
-  '--disable-translate',
-  '--hide-scrollbars',
-  '--metrics-recording-only',
-  '--mute-audio',
-  '--no-first-run',
-  '--safebrowsing-disable-auto-update',
-  '--ignore-certificate-errors',
-  '--ignore-ssl-errors',
-],
-    /**
-     * Example of configuring the linkPreview generator
-     * If you set this to 'null', it will use global servers; however, you have the option to define your own server
-     * Clone the repository https://github.com/wppconnect-team/wa-js-api-server and host it on your server with ssl
-     *
-     * Configure the attribute as follows:
-     * linkPreviewApiServers: [ 'https://www.yourserver.com/wa-js-api-server' ]
-     */
-    linkPreviewApiServers: null,
 
-    /**
-     * Set specific whatsapp version
-     */
-    // whatsappVersion: '2.xxxxx',
+  createOptions: {
+    headless: isProduction, // Auto-detect
+
+    browserArgs: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-web-security',
+      '--aggressive-cache-discard',
+      '--disable-cache',
+      '--disable-application-cache',
+      '--disable-offline-load-stale-cache',
+      '--disk-cache-size=0',
+      '--disable-background-networking',
+      '--disable-default-apps',
+      '--disable-extensions',
+      '--disable-sync',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-translate',
+      '--hide-scrollbars',
+      '--metrics-recording-only',
+      '--mute-audio',
+      '--no-first-run',
+      '--safebrowsing-disable-auto-update',
+      '--ignore-certificate-errors',
+      '--ignore-ssl-errors',
+    ],
+
+    linkPreviewApiServers: null,
   },
+
   mapper: {
     enable: false,
     prefix: 'tagone-',
   },
+
   db: {
     mongodbDatabase: 'tokens',
     mongodbCollection: '',
@@ -105,6 +112,7 @@ export default {
     redisDb: 0,
     redisPrefix: 'docker',
   },
+
   aws_s3: {
     region: 'sa-east-1' as any,
     access_key_id: null,
