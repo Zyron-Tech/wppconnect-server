@@ -1,49 +1,78 @@
+# -----------------------------
+# Stage 1: Base / Build
+# -----------------------------
 FROM node:22.21.1-alpine AS base
+
+# Set working directory
 WORKDIR /usr/src/wpp-server
+
+# Avoid Puppeteer downloading Chromium (we install system Chromium)
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Install build dependencies and runtime libraries for sharp
-RUN apk update && \
-    apk add --no-cache \
-    vips \
-    vips-dev \
-    fftw-dev \
-    gcc \
-    g++ \
+# Install build tools and libraries for sharp + Chromium runtime
+RUN apk update && apk add --no-cache \
+    python3 \
     make \
+    g++ \
+    gcc \
     libc6-compat \
     pkgconfig \
-    python3 \
+    bash \
+    curl \
+    git \
+    vips-dev \
+    fftw-dev \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
     && rm -rf /var/cache/apk/*
 
-# To make sure yarn 4 uses node-modules linker
-COPY .yarnrc.yml ./
+# Copy Yarn config and project lockfiles
+COPY .yarnrc.yml package.json yarn.lock ./
 
-# Copy only package.json to leverage Docker cache
-COPY package.json ./
-COPY yarn.lock ./
+# Enable Corepack and prepare Yarn 4.12.0
+RUN corepack enable && corepack prepare yarn@4.12.0 --activate
 
-# Enable corepack and prepare yarn 4.12.0
-RUN corepack enable && \
-    corepack prepare yarn@4.12.0 --activate
-
-# Install dependencies with immutable lockfile
+# Install all dependencies
 RUN yarn install --immutable
 
-FROM base AS build
-WORKDIR /usr/src/wpp-server
+# Copy source code
 COPY . .
-RUN yarn install
+
+# Build project
 RUN yarn build
 
-FROM build AS runtime
-WORKDIR /usr/src/wpp-server/
+# -----------------------------
+# Stage 2: Runtime
+# -----------------------------
+FROM node:22.21.1-alpine AS runtime
 
-# Install runtime dependencies (chromium and vips libraries)
+WORKDIR /usr/src/wpp-server
+
+# Install runtime dependencies only
 RUN apk add --no-cache \
     chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ttf-freefont \
+    ca-certificates \
     vips \
     fftw
 
+# Copy built project + node_modules from base
+COPY --from=base /usr/src/wpp-server/dist ./dist
+COPY --from=base /usr/src/wpp-server/node_modules ./node_modules
+COPY --from=base /usr/src/wpp-server/package.json ./package.json
+
+# Set Chromium path for WPPConnect headless mode
+ENV CHROMIUM_PATH=/usr/bin/chromium-browser
+
+# Expose WPPConnect port
 EXPOSE 21465
+
+# Start server
 ENTRYPOINT ["node", "dist/server.js"]
